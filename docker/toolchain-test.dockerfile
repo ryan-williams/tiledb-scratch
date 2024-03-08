@@ -14,6 +14,7 @@ ARG org=single-cell-data
 ARG branch=main
 RUN git clone -b ${branch} https://github.com/${org}/TileDB-SOMA
 WORKDIR TileDB-SOMA
+RUN echo '1.9.0rc0' > apis/python/RELEASE-VERSION
 
 ARG build=1
 RUN test -z "$build" || make install build=Debug
