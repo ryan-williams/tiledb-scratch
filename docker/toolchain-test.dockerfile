@@ -10,4 +10,7 @@ ARG branch=main
 RUN git clone -b ${branch} https://github.com/${org}/TileDB-SOMA
 WORKDIR TileDB-SOMA
 
+ARG build=1
+RUN test -z "$build" || make install build=Debug
+
 ENTRYPOINT [ "make", "install", "build=Debug" ]
