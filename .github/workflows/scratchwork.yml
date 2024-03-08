@@ -1,0 +1,10 @@
+name: Scratchwork
+on:
+  workflow_dispatch:
+jobs:
+  scratch:
+    name: Test for VCPKG
+    runs-on: ubuntu-latest
+    steps:
+      - run: which vcpkg
+      - run: echo $VCPKG_ROOT
