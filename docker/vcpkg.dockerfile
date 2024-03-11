@@ -1,3 +1,4 @@
+# Install VCPKG
 FROM ubuntu:22.04 as vcpkg
 
 RUN apt update \
@@ -9,6 +10,7 @@ RUN git clone https://github.com/microsoft/vcpkg.git \
  && cd vcpkg \
  && ./bootstrap-vcpkg.sh
 
+# Copy installed VCPKG, build TileDB-SOMA in debug mode
 FROM ubuntu:22.04
 
 RUN apt update -y \
@@ -24,6 +26,7 @@ RUN git clone https://github.com/single-cell-data/TileDB-SOMA
 WORKDIR TileDB-SOMA
 RUN echo '1.9.0rc0' > apis/python/RELEASE-VERSION
 
+# Optionally skip failing build (allowing shelling in for interactive debugging)
 ARG build=1
 RUN test -z "$build" || make install build=Debug
 
