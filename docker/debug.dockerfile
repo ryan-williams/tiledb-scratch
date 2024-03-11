@@ -22,5 +22,9 @@ ENV PATH=$VCPKG_ROOT:$PATH CMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems
 
 RUN git clone https://github.com/single-cell-data/TileDB-SOMA
 WORKDIR TileDB-SOMA
+RUN echo '1.9.0rc0' > apis/python/RELEASE-VERSION
+
+ARG build=1
+RUN test -z "$build" || make install build=Debug
 
 ENTRYPOINT [ "make", "install", "build=Debug" ]
