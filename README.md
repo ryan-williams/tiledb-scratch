@@ -26,39 +26,74 @@ See [segfault-repro.py](segfault-repro.py).
 
 ## Github Actions repros
 
-### M1 macs always fail
-The segfault seems to happen deterministically on M1 macs ([1][GHA mac M1 fail 3], [2][GHA mac M1 fail 2], [3][GHA mac M1 fail 1])
+Click each ✅/❌ to see the full log in Github Actions:
+<table>
+  <tr>
+    <th></th>
+    <th colspan="2">
+      <code>tiledb</code>,
+      <code>tiledbsoma</code>
+      versions
+    </th>
+  </tr>
+  <tr>
+    <th>Arch/OS</th>
+    <th>2.20.1, 1.8.1</th>
+    <th>2.21.1, <a href="https://github.com/single-cell-data/TileDB-SOMA/tree/e6822fb4f0a02256ceb487448bd0d13b073946c8"><code>e6822fb</code></a></th>
+  </tr>
+    <tr>
+        <th>Ubuntu</th>
+        <td>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457612701/job/23169976714">✅</a>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457612701/job/23170035198">✅</a>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457612701/job/23170201677">✅</a>
+        </td>
+        <td>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457048651/job/23168150126#step:9:20">✅</a>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457048651/job/23169324907">✅</a>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457048651/job/23170218569">✅</a>
+        </td>
+    </tr>
+    <tr>
+        <th>Intel Mac</th>
+        <td>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457636565/job/23170045934#step:10:20">✅</a>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457636565/job/23170117058#step:10:15">✅</a>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457636565/job/23170199274#step:10:21">❌</a>
+        </td>
+        <td>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8455805326/job/23164146330#step:9:23">❌</a>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8455805326/job/23168162572#step:9:23">❌</a>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8455805326/job/23170224565#step:9:21">❌</a>
+        </td>
+    </tr>
+    <tr>
+        <th>M1 Mac</th>
+        <td>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457661549/job/23170125204#step:10:21">❌</a>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457661549/job/23170153485#step:10:21">❌</a>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457661549/job/23170208212#step:10:21">❌</a>
+        </td>
+        <td>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8455811514/job/23164166618#step:9:23">❌</a>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8455811514/job/23168981363#step:9:23">❌</a>
+          <a href="https://github.com/ryan-williams/tiledb-scratch/actions/runs/8455811514/job/23170229995#step:9:21">❌</a>
+        </td>
+    </tr>
+</table>
 
-TileDB/SOMA versions [from a failing M1 Mac run][GHA mac m1 fail versions]:
-```
-tiledbsoma.__version__        1.8.1
-TileDB-Py tiledb.version()    (0, 26, 4)
-TileDB core version           2.20.1
-libtiledbsoma version()       libtiledb=2.20.1
-python version                3.11.8.final.0
-OS version                    Darwin 22.6.0
-```
+- M1 macs always fail
+- Intel macs sometimes fail
+  - ≈50% of runs on 2.20.1 / 1.8.1 fail:
+    - The successful runs log this error:
+      ```
+      Error: 3-27 14:51:23.364] [Process: 2862] [error] [1711551083364855000-Global] TileDB internal: mutex lock failed: Invalid argument
+      ```
+      but nevertheless exit 0.
+    - I've also seen that error message on failing M1 mac runs; not sure if it's related to the segfault.
 
-### Intel macs sometimes fail
-- GHA failures: [1][GHA mac intel fail 3], [2][GHA mac intel fail 2], [3][GHA mac intel fail 1].
-- GHA successes: [1][GHA mac intel ok 3], [2][GHA mac intel ok 2], [3][GHA mac intel ok 1]
-  - The succeeding runs output:
-    ```
-    Error: 3-27 14:51:23.364] [Process: 2862] [error] [1711551083364855000-Global] TileDB internal: mutex lock failed: Invalid argument
-    ```
-    but exit 0.
-  - I've also seen that message on failing M1 mac runs; not sure if it's related.
+  - ≈100% of runs on 2.21.1 / [`main`][`36d5b6`]
 
-TileDB/SOMA versions [from a failing Intel Mac run][GHA mac intel fail versions]:
-
-```
-tiledbsoma.__version__        1.8.1
-TileDB-Py tiledb.version()    (0, 26, 4)
-TileDB core version           2.20.1
-libtiledbsoma version()       libtiledb=2.20.1
-python version                3.11.8.final.0
-OS version                    Darwin 21.6.0
-```
 
 [GHA mac M1 fail 3]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454246138/job/23158822528#step:5:23
 [GHA mac M1 fail 2]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454148754/job/23158505366#step:5:23
@@ -71,3 +106,8 @@ OS version                    Darwin 21.6.0
 [GHA mac intel ok 3]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454246138/job/23158821889#step:5:15
 [GHA mac m1 fail versions]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454768799/job/23160614518#step:5:11
 [GHA mac intel fail versions]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454770494/job/23160897853#step:5:11
+
+[latest m1 fail]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8455811514/job/23164166618#step:9:23
+[latest intel fail]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8455805326/job/23168162572#step:9:21
+[latest ubuntu pass]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457048651/job/23168150126#step:9:20
+[`36d5b6`]: https://github.com/single-cell-data/TileDB-SOMA/tree/36d5b6e7e9657ba9d41e9f71c0b19d0468dc1f79
