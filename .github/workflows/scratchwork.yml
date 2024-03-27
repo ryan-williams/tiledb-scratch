@@ -24,7 +24,7 @@ jobs:
         if: ${{ inputs.ref != '' }}
         uses: actions/checkout@v4
         with:
-          repository: TileDB-Inc/TileDB-SOMA
+          repository: single-cell-data/TileDB-SOMA
           ref: ${{ inputs.ref }}
           path: tiledbsoma
       - uses: actions/setup-python@v5
