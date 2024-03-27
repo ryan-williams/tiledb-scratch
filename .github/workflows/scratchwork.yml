@@ -16,11 +16,7 @@ on:
         default: 'main'
 jobs:
   build:
-    name: repro (${{ inputs.runs-on }}${{ matrix.import-tiledb && ', import-tiledb' || '' }})
-    strategy:
-      fail-fast: false
-      matrix:
-        import-tiledb: [ 'IMPORT_TILEDB', '' ]
+    name: repro (${{ inputs.runs-on }})
     runs-on: ${{ inputs.runs-on }}
     steps:
       - uses: actions/checkout@v4
@@ -49,10 +45,13 @@ jobs:
         run: |
           python -c 'import tiledbsoma; tiledbsoma.show_package_versions()'
           uname -a
-      - run: |
-          python -X faulthandler segfault-repro.py
+      - name: 'Run without importing `tiledb` (always succeeds)'
+        run: ./segfault-repro.py
+      - name: 'Run with `import tiledb` before `import tiledbsoma` (sometimes segfaults)'
+        env:
+          IMPORT_TILEDB: 1
+        run: |
+          ./segfault-repro.py
           rv=$?
           echo "Exit code: $?"
           exit $rv
-        env:
-          IMPORT_TILEDB: ${{ matrix.import-tiledb }}
