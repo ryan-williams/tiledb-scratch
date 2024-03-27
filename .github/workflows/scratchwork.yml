@@ -1,22 +1,21 @@
-name: Scratchwork
+name: macOS segfault repro
 on:
   workflow_dispatch:
-    inputs:
-      runs-on:
-        description: 'Github Actions runner'
-        default: 'ubuntu-latest'
-        type: choice
-        options:
-          - 'ubuntu-latest'
-          - 'macos-latest'
-          - 'windows-latest'
-          - 'macos-latest-xlarge'
 jobs:
-  scratch:
-    name: Test for VCPKG
-    runs-on: ${{ inputs.runs-on }}
+  build:
+    name: repro
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on: [ ubuntu-latest, macos-latest, windows-latest ]
+        import-tiledb: [ '1', '' ]
+    runs-on: ${{ matrix.runs-on }}
     steps:
-      - run: env
-      - run: uname -m
-      - run: which vcpkg
-      - run: echo $VCPKG_ROOT
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11.8
+      - run: pip install tiledbsoma
+      - run: python -X faulthandler segfault-repro.py
+        env:
+          IMPORT_TILEDB: ${{ matrix.import-tiledb }}
