@@ -15,14 +15,14 @@ IMPORT_TILEDB=1 ./segfault-repro.py  # ❌ segfaults when `tiledb` is imported b
 # Segmentation fault: 11
 ```
 
+See [segfault-repro.py](segfault-repro.py).
+
 The last line reported is [here](https://github.com/single-cell-data/TileDB-SOMA/blob/1.8.1/apis/python/src/tiledbsoma/_tdb_handles.py#L58) in `_tdb_handles.open`, where it calls into libtiledbsoma:
 ```python
 soma_object = clib.SOMAObject.open(
     uri, open_mode, context.native_context, timestamp=(0, timestamp_ms)
 )
 ```
-
-See [segfault-repro.py](segfault-repro.py).
 
 ## Github Actions repros
 
@@ -84,15 +84,14 @@ Click each ✅/❌ to see the full log in Github Actions:
 
 - M1 macs always fail
 - Intel macs sometimes fail
-  - ≈50% of runs on 2.20.1 / 1.8.1 fail:
+  - ≈100% of runs fail on 2.21.1 / [`main`][`36d5b6`]
+  - ≈50% of runs fail on 2.20.1 / 1.8.1:
     - The successful runs log this error:
       ```
       Error: 3-27 14:51:23.364] [Process: 2862] [error] [1711551083364855000-Global] TileDB internal: mutex lock failed: Invalid argument
       ```
       but nevertheless exit 0.
     - I've also seen that error message on failing M1 mac runs; not sure if it's related to the segfault.
-
-  - ≈100% of runs on 2.21.1 / [`main`][`36d5b6`]
 
 
 [GHA mac M1 fail 3]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454246138/job/23158822528#step:5:23
