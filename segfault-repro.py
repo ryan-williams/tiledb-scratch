@@ -1,3 +1,5 @@
+#!/usr/bin/env python -X faulthandler
+
 import os
 
 if os.environ.get('IMPORT_TILEDB'):
