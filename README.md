@@ -17,7 +17,7 @@ IMPORT_TILEDB=1 ./segfault-repro.py  # ❌ segfaults when `tiledb` is imported b
 
 See [segfault-repro.py](segfault-repro.py).
 
-The last line reported is [here](https://github.com/single-cell-data/TileDB-SOMA/blob/1.8.1/apis/python/src/tiledbsoma/_tdb_handles.py#L58) in `_tdb_handles.open`, where it calls into libtiledbsoma:
+The last line reported is [here][_tdb_handles.py#L58] in `_tdb_handles.open`, where it calls into libtiledbsoma:
 ```python
 soma_object = clib.SOMAObject.open(
     uri, open_mode, context.native_context, timestamp=(0, timestamp_ms)
@@ -84,7 +84,7 @@ Click each ✅/❌ to see the full log in Github Actions:
 
 - M1 macs always fail
 - Intel macs sometimes fail
-  - ≈100% of runs fail on 2.21.1 / [`main`][`36d5b6`]
+  - ≈100% of runs fail on 2.21.1 / `main` ([`e6822fb`])
   - ≈50% of runs fail on 2.20.1 / 1.8.1:
     - The successful runs log this error:
       ```
@@ -94,19 +94,5 @@ Click each ✅/❌ to see the full log in Github Actions:
     - I've also seen that error message on failing M1 mac runs; not sure if it's related to the segfault.
 
 
-[GHA mac M1 fail 3]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454246138/job/23158822528#step:5:23
-[GHA mac M1 fail 2]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454148754/job/23158505366#step:5:23
-[GHA mac M1 fail 1]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8453924156/job/23157762661#step:5:23
-[GHA mac intel fail 1]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8453924156/job/23157762147#step:5:23
-[GHA mac intel fail 2]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454611098/job/23160052439#step:5:23
-[GHA mac intel fail 3]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454770494/job/23160897853#step:6:21
-[GHA mac intel ok 1]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8453784557/job/23157281978#step:5:12
-[GHA mac intel ok 2]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8453872832/job/23157599348#step:5:15
-[GHA mac intel ok 3]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454246138/job/23158821889#step:5:15
-[GHA mac m1 fail versions]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454768799/job/23160614518#step:5:11
-[GHA mac intel fail versions]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454770494/job/23160897853#step:5:11
-
-[latest m1 fail]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8455811514/job/23164166618#step:9:23
-[latest intel fail]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8455805326/job/23168162572#step:9:21
-[latest ubuntu pass]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457048651/job/23168150126#step:9:20
-[`36d5b6`]: https://github.com/single-cell-data/TileDB-SOMA/tree/36d5b6e7e9657ba9d41e9f71c0b19d0468dc1f79
+[`e6822fb`]: https://github.com/single-cell-data/TileDB-SOMA/tree/e6822fb4f0a02256ceb487448bd0d13b073946c8
+[_tdb_handles.py#L58]: https://github.com/single-cell-data/TileDB-SOMA/blob/1.8.1/apis/python/src/tiledbsoma/_tdb_handles.py#L58
