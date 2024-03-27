@@ -19,6 +19,9 @@ jobs:
     name: repro (${{ inputs.runs-on }})
     runs-on: ${{ inputs.runs-on }}
     steps:
+      - name: 'Debug github context'
+        run: |
+          echo "${{ toJSON(github.event) }}"
       - uses: actions/checkout@v4
       - name: Clone TileDB-SOMA@${{ inputs.ref }}
         if: inputs.ref != ''
