@@ -19,16 +19,7 @@ jobs:
     runs-on: ${{ inputs.runs-on }}
     steps:
       - name: 'Debug: `github` context'
-        run: |
-          echo "${{ toJSON(github.event) }}"
-      - name: 'Test inputs.ref check'
-        if: inputs.ref
-        run: |
-          echo "Ref: ${{ inputs.ref }}"
-      - name: 'Test inputs.ref check 2'
-        if: inputs.ref != ''
-        run: |
-          echo "Ref: ${{ inputs.ref }}"
+        run: echo "${{ toJSON(github.event) }}"
       - uses: actions/checkout@v4
       - name: Clone TileDB-SOMA@${{ inputs.ref }}
         if: inputs.ref != ''
