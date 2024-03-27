@@ -26,6 +26,8 @@ jobs:
           python-version: 3.11.8
           cache: pip
       - run: pip install -r requirements.txt
+      - name: Show TileDB/SOMA versions
+        run: python -c 'import tiledbsoma; tiledbsoma.show_package_versions()'
       - run: |
           python -X faulthandler segfault-repro.py
           rv=$?
