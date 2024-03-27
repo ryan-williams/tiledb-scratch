@@ -30,15 +30,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11.8
+          cache: pip
       - run: |
           if [ -d tiledbsoma ]; then
             echo "Installing TileDB-SOMA from source"
-            cd tiledbsoma
-            echo "1.9.0rc0" > apis/python/RELEASE-VERSION
-            pip install -e apis/python
+            echo "1.9.0rc0" > tiledbsoma/apis/python/RELEASE-VERSION
+            pip install -r requirements-local.txt
           else
             echo "Installing TileDB-SOMA from PyPI"
-            pip install tiledbsoma
+            pip install -r requirements-pypi.txt
           fi
       - run: pip list
       - name: Show TileDB/SOMA/OS versions
