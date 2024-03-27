@@ -1,4 +1,4 @@
-#!/usr/bin/env python -X faulthandler
+#!/usr/bin/env -S python -X faulthandler
 
 import os
 
