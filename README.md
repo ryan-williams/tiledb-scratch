@@ -25,19 +25,25 @@ soma_object = clib.SOMAObject.open(
 See [segfault-repro.py](segfault-repro.py).
 
 ## Github Actions repros
-The segfault seems to happen deterministically on M1 macs ([1][GHA mac M1 fail 3], [2][GHA mac M1 fail 2], [3][GHA mac M1 fail 1]), and non-deterministically on x86 macs ([1][GHA mac intel fail 1]).
 
-Intel mac GHA runs usually succeed ([1][GHA mac intel ok 3], [2][GHA mac intel ok 2], [3][GHA mac intel ok 1]), but output:
-```
-Error: 3-27 14:51:23.364] [Process: 2862] [error] [1711551083364855000-Global] TileDB internal: mutex lock failed: Invalid argument
-```
+### M1 macs always fail
+The segfault seems to happen deterministically on M1 macs ([1][GHA mac M1 fail 3], [2][GHA mac M1 fail 2], [3][GHA mac M1 fail 1])
 
-I've also seen that message on failing M1 mac runs; not sure if it's related.
+### Intel macs sometimes fail
+- GHA failures: [1][GHA mac intel fail 2], [2][GHA mac intel fail 1].
+- GHA successes: [1][GHA mac intel ok 3], [2][GHA mac intel ok 2], [3][GHA mac intel ok 1])
+  - The succeeding runs output:
+    ```
+    Error: 3-27 14:51:23.364] [Process: 2862] [error] [1711551083364855000-Global] TileDB internal: mutex lock failed: Invalid argument
+    ```
+    but exit 0.
+- I've also seen that message on failing M1 mac runs; not sure if it's related.
 
 [GHA mac M1 fail 3]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454246138/job/23158822528#step:5:23
 [GHA mac M1 fail 2]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454148754/job/23158505366#step:5:23
 [GHA mac M1 fail 1]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8453924156/job/23157762661#step:5:23
 [GHA mac intel fail 1]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8453924156/job/23157762147#step:5:23
+[GHA mac intel fail 2]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454611098/job/23160052439#step:5:23
 [GHA mac intel ok 1]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8453784557/job/23157281978#step:5:12
 [GHA mac intel ok 2]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8453872832/job/23157599348#step:5:15
 [GHA mac intel ok 3]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454246138/job/23158821889#step:5:15
