@@ -7,7 +7,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runs-on: [ ubuntu-latest, macos-latest, windows-latest ]
+        runs-on:
+          - ubuntu-latest
+          - macos-latest
+          # - windows-latest
         import-tiledb: [ '1', '' ]
     runs-on: ${{ matrix.runs-on }}
     steps:
@@ -16,6 +19,10 @@ jobs:
         with:
           python-version: 3.11.8
       - run: pip install tiledbsoma
-      - run: python -X faulthandler segfault-repro.py
+      - run: |
+          python -X faulthandler segfault-repro.py
+          rv=$?
+          echo "Exit code: $?"
+          exit $rv
         env:
           IMPORT_TILEDB: ${{ matrix.import-tiledb }}
