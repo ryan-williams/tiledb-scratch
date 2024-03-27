@@ -11,6 +11,9 @@ on:
           - macos-latest-xlarge
           - ubuntu-latest
           # - windows-latest
+      ref:
+        description: 'Branch or tag clone/install/test (leave blank to install latest version from PyPI)'
+        default: 'main'
 jobs:
   build:
     name: repro (${{ inputs.runs-on }}${{ matrix.import-tiledb && ', import-tiledb' || '' }})
@@ -21,13 +24,31 @@ jobs:
     runs-on: ${{ inputs.runs-on }}
     steps:
       - uses: actions/checkout@v4
+      - name: Clone TileDB-SOMA@${{ inputs.ref }}
+        if: ${{ inputs.ref != '' }}
+        uses: actions/checkout@v4
+        with:
+          repository: TileDB-Inc/TileDB-SOMA
+          ref: ${{ inputs.ref }}
+          path: tiledbsoma
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11.8
-          cache: pip
-      - run: pip install -r requirements.txt
-      - name: Show TileDB/SOMA versions
-        run: python -c 'import tiledbsoma; tiledbsoma.show_package_versions()'
+      - run: |
+          if [ -d tiledbsoma ]; then
+            echo "Installing TileDB-SOMA from source"
+            cd tiledbsoma
+            echo "1.9.0rc0" > apis/python/RELEASE-VERSION
+            pip install -e apis/python
+          else
+            echo "Installing TileDB-SOMA from PyPI"
+            pip install tiledbsoma
+          fi
+      - run: pip list
+      - name: Show TileDB/SOMA/OS versions
+        run: |
+          python -c 'import tiledbsoma; tiledbsoma.show_package_versions()'
+          uname -a
       - run: |
           python -X faulthandler segfault-repro.py
           rv=$?

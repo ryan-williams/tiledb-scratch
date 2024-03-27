@@ -29,21 +29,45 @@ See [segfault-repro.py](segfault-repro.py).
 ### M1 macs always fail
 The segfault seems to happen deterministically on M1 macs ([1][GHA mac M1 fail 3], [2][GHA mac M1 fail 2], [3][GHA mac M1 fail 1])
 
+TileDB/SOMA versions [from a failing M1 Mac run][GHA mac m1 fail versions]:
+```
+tiledbsoma.__version__        1.8.1
+TileDB-Py tiledb.version()    (0, 26, 4)
+TileDB core version           2.20.1
+libtiledbsoma version()       libtiledb=2.20.1
+python version                3.11.8.final.0
+OS version                    Darwin 22.6.0
+```
+
 ### Intel macs sometimes fail
-- GHA failures: [1][GHA mac intel fail 2], [2][GHA mac intel fail 1].
-- GHA successes: [1][GHA mac intel ok 3], [2][GHA mac intel ok 2], [3][GHA mac intel ok 1])
+- GHA failures: [1][GHA mac intel fail 3], [2][GHA mac intel fail 2], [3][GHA mac intel fail 1].
+- GHA successes: [1][GHA mac intel ok 3], [2][GHA mac intel ok 2], [3][GHA mac intel ok 1]
   - The succeeding runs output:
     ```
     Error: 3-27 14:51:23.364] [Process: 2862] [error] [1711551083364855000-Global] TileDB internal: mutex lock failed: Invalid argument
     ```
     but exit 0.
-- I've also seen that message on failing M1 mac runs; not sure if it's related.
+  - I've also seen that message on failing M1 mac runs; not sure if it's related.
+
+TileDB/SOMA versions [from a failing Intel Mac run][GHA mac intel fail versions]:
+
+```
+tiledbsoma.__version__        1.8.1
+TileDB-Py tiledb.version()    (0, 26, 4)
+TileDB core version           2.20.1
+libtiledbsoma version()       libtiledb=2.20.1
+python version                3.11.8.final.0
+OS version                    Darwin 21.6.0
+```
 
 [GHA mac M1 fail 3]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454246138/job/23158822528#step:5:23
 [GHA mac M1 fail 2]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454148754/job/23158505366#step:5:23
 [GHA mac M1 fail 1]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8453924156/job/23157762661#step:5:23
 [GHA mac intel fail 1]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8453924156/job/23157762147#step:5:23
 [GHA mac intel fail 2]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454611098/job/23160052439#step:5:23
+[GHA mac intel fail 3]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454770494/job/23160897853#step:6:21
 [GHA mac intel ok 1]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8453784557/job/23157281978#step:5:12
 [GHA mac intel ok 2]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8453872832/job/23157599348#step:5:15
 [GHA mac intel ok 3]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454246138/job/23158821889#step:5:15
+[GHA mac m1 fail versions]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454768799/job/23160614518#step:5:11
+[GHA mac intel fail versions]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8454770494/job/23160897853#step:5:11
