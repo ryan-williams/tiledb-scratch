@@ -13,7 +13,6 @@ on:
           # - windows-latest
       ref:
         description: 'Branch or tag clone/install/test (leave blank to install latest version from PyPI)'
-        default: 'main'
 jobs:
   build:
     name: repro (${{ inputs.runs-on }})
