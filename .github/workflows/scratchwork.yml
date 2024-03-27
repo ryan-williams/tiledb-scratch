@@ -1,19 +1,24 @@
-name: macOS segfault repro
+name: segfault repro
 on:
   workflow_dispatch:
+    inputs:
+      runs-on:
+        description: 'Select a runner ("macos-latest" = Intel, "macos-latest-xlarge" = M1)'
+        default: 'macos-latest-xlarge'
+        type: choice
+        options:
+          - macos-latest
+          - macos-latest-xlarge
+          - ubuntu-latest
+          # - windows-latest
 jobs:
   build:
-    name: repro
+    name: repro (${{ inputs.runs-on }}${{ matrix.import-tiledb && ', import-tiledb' || '' }})
     strategy:
       fail-fast: false
       matrix:
-        runs-on:
-          - ubuntu-latest
-          - macos-latest  # intel
-          - macos-latest-xlarge  # M1
-          # - windows-latest
         import-tiledb: [ 'IMPORT_TILEDB', '' ]
-    runs-on: ${{ matrix.runs-on }}
+    runs-on: ${{ inputs.runs-on }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
