@@ -7,4 +7,4 @@ if os.environ.get('IMPORT_TILEDB'):
 import tiledbsoma
 
 
-tiledbsoma.Experiment.open("pbmc-small")
+print(tiledbsoma.Experiment.open("pbmc-small"))

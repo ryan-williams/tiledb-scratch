@@ -9,9 +9,10 @@ jobs:
       matrix:
         runs-on:
           - ubuntu-latest
-          - macos-latest
+          - macos-latest  # intel
+          - macos-latest-xlarge  # M1
           # - windows-latest
-        import-tiledb: [ '1', '' ]
+        import-tiledb: [ 'IMPORT_TILEDB', '' ]
     runs-on: ${{ matrix.runs-on }}
     steps:
       - uses: actions/checkout@v4
