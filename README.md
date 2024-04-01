@@ -90,9 +90,11 @@ Click each ✅/❌ to see the full log in Github Actions:
       ```
       Error: 3-27 14:51:23.364] [Process: 2862] [error] [1711551083364855000-Global] TileDB internal: mutex lock failed: Invalid argument
       ```
-      but nevertheless exit 0.
+      but nevertheless exit 0 ([example][intel mac ok error msg 1], [example][intel mac ok error msg 2]).
     - I've also seen that error message on failing M1 mac runs; not sure if it's related to the segfault.
 
 
 [`e6822fb`]: https://github.com/single-cell-data/TileDB-SOMA/tree/e6822fb4f0a02256ceb487448bd0d13b073946c8
 [_tdb_handles.py#L58]: https://github.com/single-cell-data/TileDB-SOMA/blob/1.8.1/apis/python/src/tiledbsoma/_tdb_handles.py#L58
+[intel mac ok error msg 1]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457636565/job/23170045934#step:10:15
+[intel mac ok error msg 2]: https://github.com/ryan-williams/tiledb-scratch/actions/runs/8457636565/job/23170117058#step:10:15
