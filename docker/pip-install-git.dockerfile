@@ -10,7 +10,7 @@ RUN git clone https://github.com/microsoft/vcpkg.git \
  && cd vcpkg \
  && ./bootstrap-vcpkg.sh
 
-# Copy installed VCPKG, build TileDB-SOMA in debug mode
+# Copy installed VCPKG, `pip install -e` tiledbsoma via git+https URL
 FROM ubuntu:22.04
 
 RUN apt update -y \
@@ -24,4 +24,4 @@ ENV PATH=$VCPKG_ROOT:$PATH CMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems
 
 ARG editable=-e
 ARG branch=main
-RUN pip install ${editable} 'git+https://github.com/single-cell-data/TileDB-SOMA@${branch}#egg=tiledbsoma&subdirectory=apis/python/'
+RUN pip install ${editable} "git+https://github.com/single-cell-data/TileDB-SOMA@${branch}#egg=tiledbsoma&subdirectory=apis/python/"
