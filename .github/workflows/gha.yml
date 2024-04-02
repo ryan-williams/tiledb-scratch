@@ -1,10 +1,14 @@
-# Placeholder Action on `main` branch, to be implemented/customized on
-# individual branches, to repro specific issues.
-name: Example Action
+name: 'Test `pip install -e` via git+https URL'
 on:
   workflow_dispatch:
 jobs:
-  job:
-    runs-on: ${{ inputs.runs-on }}
+  pip-install:
+    name: 'Test `pip install` via git+https URL'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ref: [ 'main', 'release-1.7', 'release-1.8', 'release-1.9' ]
+        editable: [ '-e', '' ]
     steps:
-      - run: echo "Hello, World!"
+      - run: |
+          pip install ${{ matrix.editable }} 'git+https://github.com/single-cell-data/TileDB-SOMA.git@${{ matrix.ref }}#egg=tiledbsoma&subdirectory=apis/python/'
