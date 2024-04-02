@@ -1,6 +1,14 @@
 name: 'Test `pip install -e` via git+https URL'
 on:
   workflow_dispatch:
+    inputs:
+      python-version:
+        description: 'Python version'
+        default: '3.11.8'
+      user-install:
+        description: 'Install to user site'
+        type: 'boolean'
+        default: false
 jobs:
   pip-install:
     name: '${{ matrix.ref }} ${{ matrix.editable }}: test `pip install` via git+https URL'
@@ -11,5 +19,8 @@ jobs:
         ref: [ 'main', ] # 'release-1.7', 'release-1.8', 'release-1.9' ]
         editable: [ '-e', '' ]
     steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
       - run: |
-          pip install --user ${{ matrix.editable }} 'git+https://github.com/single-cell-data/TileDB-SOMA.git@${{ matrix.ref }}#egg=tiledbsoma&subdirectory=apis/python/'
+          pip install ${{ inputs.user-install && '--user' || '' }} ${{ matrix.editable }} 'git+https://github.com/single-cell-data/TileDB-SOMA.git@${{ matrix.ref }}#egg=tiledbsoma&subdirectory=apis/python/'
