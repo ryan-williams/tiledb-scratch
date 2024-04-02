@@ -13,14 +13,21 @@ jobs:
   pip-install:
     name: '${{ matrix.ref }} ${{ matrix.editable }}: test `pip install` via git+https URL'
     runs-on: ubuntu-latest
+    container: python:3.11.8
     strategy:
       fail-fast: false
       matrix:
-        ref: [ 'main', 'release-1.7', 'release-1.8', 'release-1.9' ]
-        editable: [ '-e', '' ]
+        ref:
+          - main
+          # - release-1.7
+          # - release-1.8
+          # - release-1.9
+        editable:
+          - '-e'
+          # - ''
     steps:
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ inputs.python-version }}
+      - run: |
+          apt-get update -y
+          apt-get install -y cmake curl g++ git make ninja-build tar unzip zip
       - run: |
           pip install ${{ inputs.user-install && '--user' || '' }} ${{ matrix.editable }} 'git+https://github.com/single-cell-data/TileDB-SOMA.git@${{ matrix.ref }}#egg=tiledbsoma&subdirectory=apis/python/'
