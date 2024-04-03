@@ -1,0 +1,10 @@
+# Placeholder Action on `main` branch, to be implemented/customized on
+# individual branches, to repro specific issues.
+name: Example Action
+on:
+  workflow_dispatch:
+jobs:
+  job:
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - run: echo "Hello, World!"
