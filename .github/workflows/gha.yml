@@ -5,6 +5,18 @@ on:
       python-version:
         description: 'Python version'
         default: '3.11.8'
+      ubuntu-latest:
+        description: 'Ubuntu'
+        type: boolean
+        default: true
+      macos-latest:
+        description: 'Intel Mac'
+        type: boolean
+        default: true
+      macos-latest-xlarge:
+        description: 'ARM Mac'
+        type: boolean
+        default: true
 jobs:
   pip-install:
     name: '${{ matrix.runs-on }} ${{ matrix.ref }} pip install${{ matrix.editable }} git+https'
@@ -12,10 +24,13 @@ jobs:
       fail-fast: false
       matrix:
         runs-on:
-            - ubuntu-latest
-            - macos-latest
+          - ${{ inputs.ubuntu-latest && 'ubuntu-latest' || '' }}
+          - ${{ inputs.macos-latest && 'macos-latest' || '' }}
+          - ${{ inputs.macos-latest-xlarge && 'macos-latest-xlarge' || '' }}
         ref: [ main, ] # release-1.7, release-1.8, release-1.9 ]
         editable: [ ' -e', ] # '' ]
+        exclude:
+          - runs-on: ''
     runs-on: ${{ matrix.runs-on }}
     steps:
       - uses: actions/setup-python@v5
