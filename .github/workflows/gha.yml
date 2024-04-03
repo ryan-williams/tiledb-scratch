@@ -27,7 +27,7 @@ jobs:
           - ${{ inputs.ubuntu-latest && 'ubuntu-latest' || '' }}
           - ${{ inputs.macos-latest && 'macos-latest' || '' }}
           - ${{ inputs.macos-latest-xlarge && 'macos-latest-xlarge' || '' }}
-        ref: [ main, ] # release-1.7, release-1.8, release-1.9 ]
+        ref: [ main, release-1.7, release-1.8, release-1.9 ]
         editable: [ ' -e', ] # '' ]
         exclude:
           - runs-on: ''
