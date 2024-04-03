@@ -1,6 +1,6 @@
 # Placeholder Action on `main` branch, to be implemented/customized on
 # individual branches, to repro specific issues.
-name: Example Action
+name: build-debug.yml
 on:
   workflow_dispatch:
 jobs:
