@@ -31,7 +31,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11.8
+      - run: env
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
       - name: Synthesize version
         run: |
-          echo "1.9.0rc0" > apis/python/RELEASE-VERSION
+          echo "1.11.0rc0" > apis/python/RELEASE-VERSION
       - run: make install build=Debug
