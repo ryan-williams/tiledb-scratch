@@ -77,7 +77,7 @@ jobs:
           python -c 'from distutils import util; print("distutil.util.get_platform:", util.get_platform())'
           python -c 'import platform; print("platform.platform()", platform.platform())'
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.18.1
+        uses: pypa/cibuildwheel@v2.11.3
         with:
           package-dir: tiledbsoma.tar.gz
         env:
