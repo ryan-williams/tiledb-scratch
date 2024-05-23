@@ -77,7 +77,7 @@ jobs:
           python -c 'from distutils import util; print("distutil.util.get_platform:", util.get_platform())'
           python -c 'import platform; print("platform.platform()", platform.platform())'
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.11.3
+        uses: pypa/cibuildwheel@v2.14.1
         with:
           package-dir: tiledbsoma.tar.gz
         env:
@@ -129,7 +129,7 @@ jobs:
           cd ..
           echo
       - name: Upload wheels-${{ matrix.wheel_name }} to GitHub Actions storage
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: wheels-${{ matrix.wheel_name }}
           path: ./wheelhouse/*.whl
