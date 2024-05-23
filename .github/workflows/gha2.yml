@@ -1,0 +1,19 @@
+# Placeholder Action on `main` branch, to be implemented/customized on
+# individual branches, to repro specific issues.
+name: gha2.yml
+on:
+  workflow_dispatch:
+    inputs:
+      runs-on:
+        description: Host
+        type: choice
+        options:
+          - ubuntu-latest
+          - macos-latest
+          - macos-latest-xlarge
+          - windows-latest
+jobs:
+  job:
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - run: echo "Hello, World!"
