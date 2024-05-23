@@ -1,33 +1,22 @@
 # Workflow to build distribution, and push to PyPI or TestPyPI
-
 name: TileDB-SOMA python sdist & wheels
-
 on:
   # Trigger publication to TestPyPI via user workflow request:
   #     gh workflow run python-packaging.yml --ref branch
   # Specify the branch or other ref as required, allowing testing
   # of PRs/branches.
   workflow_dispatch:
-
-  # Trigger publication to PyPi via new release event.
-  release:
-    types: [published]
-  # Schedule wheel-build and smoke-test on a regular schedule.
-  #
-  # This will not publish to either PyPI or TestPyPI (see the conditionals
-  # guarding those steps below).
-  schedule:
-    - cron: "42 9 * * *"
-
+  push:
+    branches: [ smoke-test ]
 jobs:
   sdist:
     name: Build source distribution
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout TileDB-SOMA
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # ensure we get all tags to inform package version determination
+          repository: single-cell-data/TileDB-SOMA
       - name: Build sdist
         run: python setup.py sdist
         working-directory: ./apis/python
@@ -202,64 +191,3 @@ jobs:
             pip3 install /mnt/$WHL
             python3 -c 'import tiledbsoma; print(tiledbsoma.pytiledbsoma.__file__); tiledbsoma.show_package_versions()'
           "
-  # Publish to TestPyPI upon user workflow request
-  publish-to-test-pypi:
-    name: Publish package to TestPyPI
-    needs: smoke-test
-    runs-on: ubuntu-20.04
-    if: github.event_name == 'workflow_dispatch'
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-      - name: Create dist
-        run: |
-          set -x
-          mkdir dist
-          cp sdist/tiledbsoma-*.tar.gz wheels-*/*.whl dist
-          ls -l dist
-      - name: Publish packages to TestPyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        continue-on-error: true
-        with:
-          password: ${{ secrets.TEST_PYPI_TOKEN }}
-          repository-url: https://test.pypi.org/legacy/
-          packages_dir: dist
-          verbose: true
-
-  # Publish to PyPI upon release.
-  publish-to-pypi:
-    name: Publish package to PyPI
-    needs: smoke-test
-    runs-on: ubuntu-20.04
-    if: github.event_name == 'release'
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-      - name: Create dist
-        run: |
-          set -x
-          mkdir dist
-          cp sdist/tiledbsoma-*.tar.gz wheels-*/*.whl dist
-          ls -l dist
-      - name: Publish packages to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_TOKEN }}
-          packages_dir: dist
-          verbose: true
-
-  # File a bug report if anything fails, but don't file tickets for manual runs
-  # -- only for scheduled ones.
-  create_issue_on_fail:
-    runs-on: ubuntu-latest
-    needs: [smoke-test, publish-to-test-pypi, publish-to-pypi]
-    if: (failure() || cancelled()) && github.event_name != 'workflow_dispatch'
-    steps:
-      - name: Checkout TileDB-SOMA `main`
-        uses: actions/checkout@v2
-      - name: Create Issue if Build Fails
-        uses: JasonEtco/create-an-issue@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          filename: .github/workflows/daily-test-build-issue-template.md
