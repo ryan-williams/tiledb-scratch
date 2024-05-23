@@ -1,19 +1,72 @@
-# Placeholder Action on `main` branch, to be implemented/customized on
-# individual branches, to repro specific issues.
-name: gha2.yml
+# Workflow to build distribution, and push to PyPI or TestPyPI
+name: Install wheel
 on:
+  # Trigger publication to TestPyPI via user workflow request:
+  #     gh workflow run python-packaging.yml --ref branch
+  # Specify the branch or other ref as required, allowing testing
+  # of PRs/branches.
   workflow_dispatch:
-    inputs:
-      runs-on:
-        description: Host
-        type: choice
-        options:
-          - ubuntu-latest
-          - macos-latest
-          - macos-latest-xlarge
-          - windows-latest
+  push:
+    branches: [ install-wheel ]
 jobs:
-  job:
-    runs-on: ${{ inputs.runs-on }}
+  # This step locally tries out the built wheels, without publishing to PyPI
+  smoke-test:
+    name: Smoke test wheels
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-20.04
+            platform: manylinux2014
+            arch: x86_64
+            cc: gcc-11
+            cxx: g++-11
+          - os: macos-12
+            platform: macosx
+            arch: x86_64
+            cc: clang
+            cxx: clang++
+          - os: macos-14
+            platform: macosx
+            arch: arm64
+            cc: clang
+            cxx: clang++
     steps:
-      - run: echo "Hello, World!"
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+      - name: Show self-reported platform
+        run: |
+          sw_vers || /usr/bin/true
+          echo "python --version"; python --version
+          echo matrix.platform: ${{ matrix.platform }}
+          echo matrix.arch: ${{ matrix.arch }}
+          # This bit is crucial since it's used to match up to a component of the wheel-file name
+          python -m pip install setuptools
+          python -c 'from distutils import util; print("distutil.util.get_platform:", util.get_platform())'
+          python -c 'import platform; print("platform.platform()", platform.platform())'
+      - name: Install wheel
+        run: |
+          set -x
+          ls -lR
+          ls -lR wheels-*
+          WHL=$(find . -name 'tiledbsoma-*-cp311-cp311-*${{ matrix.platform }}*_${{ matrix.arch }}.whl')
+          if [ -z "$WHL" ]; then echo "No wheel found"; exit 1; fi
+          unzip -l $WHL
+          python -m pip install wheel
+          python -m pip install -vv $WHL
+          echo "WHL=$WHL" >> $GITHUB_ENV
+      - name: Smoke test ${{ matrix.os }}
+        run: python -c 'import tiledbsoma; print(tiledbsoma.pytiledbsoma.__file__); tiledbsoma.show_package_versions()'
+        # TODO: more thorough local smoke test
+      - name: Smoke test in docker
+        if: ${{ matrix.platform == 'manylinux2014' }}
+        run: |
+          docker run -v $(pwd):/mnt python:3.11 bash -ec "
+            apt-get -qq update && apt-get install -y python3-pip python3-wheel
+            pip3 install /mnt/$WHL
+            python3 -c 'import tiledbsoma; print(tiledbsoma.pytiledbsoma.__file__); tiledbsoma.show_package_versions()'
+          "
