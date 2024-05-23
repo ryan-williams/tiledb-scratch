@@ -48,8 +48,6 @@ jobs:
             cibw_archs_macos: x86_64
             platform: macosx
             wheel_name: macos-x86_64
-            cibw_environment: >
-              MACOSX_DEPLOYMENT_TARGET=10.9
           - os: macos-14
             cibw_build: 'cp3*-macosx_arm64'
             cibw_archs_macos: arm64
