@@ -11,9 +11,13 @@ on:
           - ubuntu-latest
           - macos-latest
           - macos-latest-xlarge
+          - macos12
+          - macos12-large
+          - macos12-xlarge
+          - macos14
           - windows-latest
 jobs:
   job:
     runs-on: ${{ inputs.runs-on }}
     steps:
-      - run: echo "Hello, World!"
+      - run: uname -m
