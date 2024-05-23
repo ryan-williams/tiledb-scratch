@@ -1,15 +1,13 @@
-# Workflow to build distribution, and push to PyPI or TestPyPI
 name: Install wheel
 on:
-  # Trigger publication to TestPyPI via user workflow request:
-  #     gh workflow run python-packaging.yml --ref branch
-  # Specify the branch or other ref as required, allowing testing
-  # of PRs/branches.
   workflow_dispatch:
+    inputs:
+        run-id:
+          description: 'Workflow run ID to download wheel artifacts from'
   push:
-    branches: [ install-wheel ]
+    branches: [ install-wheel-test ]
 jobs:
-  # This step locally tries out the built wheels, without publishing to PyPI
+  # This step locally tries out the built wheels
   smoke-test:
     name: Smoke test wheels
     runs-on: ${{ matrix.os }}
@@ -37,7 +35,10 @@ jobs:
         with:
           python-version: 3.11
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ inputs.run-id }}
       - name: Show self-reported platform
         run: |
           sw_vers || /usr/bin/true
