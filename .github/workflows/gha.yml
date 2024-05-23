@@ -47,11 +47,15 @@ jobs:
             cibw_archs_macos: x86_64
             platform: macosx
             wheel_name: macos-x86_64
+            cibw_environment: >
+              MACOSX_DEPLOYMENT_TARGET=10.15
           - os: macos-14
             cibw_build: 'cp3*-macosx_arm64'
             cibw_archs_macos: arm64
             platform: macosx
             wheel_name: macos-arm64
+            cibw_environment: >
+              MACOSX_DEPLOYMENT_TARGET=11.0
     steps:
       - name: Download sdist artifact
         uses: actions/download-artifact@v3
@@ -73,7 +77,7 @@ jobs:
           python -c 'from distutils import util; print("distutil.util.get_platform:", util.get_platform())'
           python -c 'import platform; print("platform.platform()", platform.platform())'
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.11.3
+        uses: pypa/cibuildwheel@v2.18.1
         with:
           package-dir: tiledbsoma.tar.gz
         env:
@@ -87,6 +91,7 @@ jobs:
           CIBW_ARCHS_MACOS: ${{ matrix.cibw_archs_macos }}
           CIBW_TEST_SKIP: "*_arm64"
           CMAKE_OSX_ARCHITECTURES: ${{ matrix.cibw_archs_macos }}
+          CIBW_ENVIRONMENT: ${{ matrix.cibw_environment }}
       # See https://github.com/single-cell-data/TileDB-SOMA/pull/2620
       #
       # * MacOS 12 and 14 self-report as `macosx-10.9-universal2` via
@@ -142,23 +147,29 @@ jobs:
             arch: x86_64
             cc: gcc-11
             cxx: g++-11
+            wheel_name: manylinux2014
           - os: macos-12
             platform: macosx
             arch: x86_64
             cc: clang
             cxx: clang++
+            wheel_name: macos-x86_64
           - os: macos-14
             platform: macosx
             arch: arm64
             cc: clang
             cxx: clang++
+            wheel_name: macos-arm64
+      fail-fast: false
     steps:
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-${{ matrix.wheel_name }}
       - name: Show self-reported platform
         run: |
           sw_vers || /usr/bin/true
@@ -173,8 +184,8 @@ jobs:
         run: |
           set -x
           ls -lR
-          ls -lR wheels-*
           WHL=$(find . -name 'tiledbsoma-*-cp311-cp311-*${{ matrix.platform }}*_${{ matrix.arch }}.whl')
+          echo "WHL=$WHL"
           if [ -z "$WHL" ]; then echo "No wheel found"; exit 1; fi
           unzip -l $WHL
           python -m pip install wheel
