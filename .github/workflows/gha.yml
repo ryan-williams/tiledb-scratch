@@ -4,8 +4,14 @@ on:
     inputs:
       ref:
         description: 'Branch or tag to build'
-        required: true
         default: 'main'
+      reps:
+        description: 'Number of times to repeat specific tests of interest'
+        type: number
+        default: 20
+      tests:
+        description: 'Specific testes to run repeatedly'
+        default: 'test_dataframe.py test_experiment_query.py'
 jobs:
   test:
     strategy:
@@ -27,6 +33,14 @@ jobs:
       - run: make install build=Debug
       - run: make data
       - run: pip install -e apis/python[dev]
-      - run: |
-          cd apis/python
-          pytest tests
+      - working-directory: apis/python
+        run: |
+          for t in ${{ inputs.tests }}; do
+            for i in `seq ${{ inputs.reps }}`; do
+              echo "Test $t, iteration $i:"
+              pytest tests/$t &> $t.txt || cat $t.txt
+            done
+          done
+      - name: Run all tests
+        working-directory: apis/python
+        run: pytest tests
