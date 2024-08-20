@@ -1,19 +1,43 @@
-# Placeholder Action on `main` branch, to be implemented/customized on
-# individual branches, to repro specific issues.
-name: gha.yml
+name: Build and Install TileDB-SOMA
 on:
   workflow_dispatch:
     inputs:
       runs-on:
-        description: Host
+        description: 'Select a runner ("macos-latest" = Intel, "macos-latest-xlarge" = M1)'
+        default: ubuntu-latest
         type: choice
         options:
-          - ubuntu-latest
           - macos-latest
           - macos-latest-xlarge
-          - windows-latest
+          - ubuntu-latest
+          # - windows-latest
+      ref:
+        description: 'TileDB-SOMA branch or tag clone/install/test (leave blank to install latest version from PyPI)'
+        default: 'main'
+      checkout:
+        description: 'Checkout TileDB-SOMA at this commit or ref'
 jobs:
-  job:
-    runs-on: ${{ inputs.runs-on }}
+  build:
+    name: repro (${{ inputs.runs-on || 'ubuntu-latest' }})
+    runs-on: ${{ inputs.runs-on || 'ubuntu-latest' }}
     steps:
-      - run: echo "Hello, World!"
+      - name: 'Debug: `github` context'
+        run: echo "${{ toJSON(github.event) }}"
+      - name: Clone TileDB-SOMA@${{ inputs.ref || 'main' }}
+        uses: actions/checkout@v4
+        with:
+          repository: single-cell-data/TileDB-SOMA
+          ref: ${{ inputs.ref || 'main' }}
+          fetch-depth: ${{ inputs.checkout == '' && 1 || 0 }}
+      - if: inputs.checkout != ''
+        run: git checkout ${{ inputs.checkout }}
+      - run: git log -1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11.8
+      - run: make install
+      - run: pip list
+      - name: Show TileDB/SOMA/OS versions
+        run: |
+          python -c 'import tiledbsoma; tiledbsoma.show_package_versions()'
+          uname -a
