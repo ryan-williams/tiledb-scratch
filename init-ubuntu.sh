@@ -38,26 +38,25 @@ git clone https://github.com/single-cell-data/TileDB-SOMA
 git clone https://github.com/chanzuckerberg/cellxgene-census
 pip install -e cellxgene-census/tools/cellxgene_census_builder
 
-test() {
-    pushd ~/TileDB-SOMA
-    echo "Testing $1"
-    git checkout "$1"
+cat >test.sh <<EOF
+#!/usr/bin/env bash
+for arg in "\$@"; do
+    cd ~/TileDB-SOMA
+    echo "Testing \$arg"
+    git checkout "\$arg"
     git --no-pager log -1
     make clean
     pip install -e apis/python
     cd ~/cellxgene-census/tools/cellxgene_census_builder
-    pytest tests/test_builder.py
-    rv=$?
-    popd
-    return $rv
-}
+    pytest tests/test_builder.py && echo "✅ \$arg succeeded" || echo "❌ \$arg failed"
+done
+EOF
+chmod 755 test.sh
 
-# test 7241fef7   # ❌ fails
-# test 7241fef7^  # ✅ passes
+# ./test.sh 7241fef7   # ❌ fails
+# ./test.sh 7241fef7^  # ✅ passes
 
 if [ $# -eq 0 ]; then
     set -- main
 fi
-for arg in "$@"; do
-    test "$arg" && echo "✅ $arg succeeded" || echo "❌ $arg failed"
-done
+./test.sh "$@"
