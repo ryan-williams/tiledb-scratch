@@ -1,4 +1,4 @@
-name: Build and Install TileDB-SOMA
+name: Test cellxgene_census_builder/tests/test_builder.py
 on:
   workflow_dispatch:
     inputs:
@@ -23,21 +23,41 @@ jobs:
     steps:
       - name: 'Debug: `github` context'
         run: echo "${{ toJSON(github.event) }}"
+      - name: Clone census
+        uses: actions/checkout@v4
+        with:
+          repository: chanzuckerberg/cellxgene-census
+          ref: main
+          path: census
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11.8
+      - name: Install cellxgene_census_builder
+        run: |
+          pip install -e census/tools/cellxgene_census_builder
+          pip list
+          python -c 'import cellxgene_census_builder'
       - name: Clone TileDB-SOMA@${{ inputs.ref || 'main' }}
         uses: actions/checkout@v4
         with:
           repository: single-cell-data/TileDB-SOMA
           ref: ${{ inputs.ref || 'main' }}
           fetch-depth: ${{ inputs.checkout == '' && 1 || 0 }}
-      - if: inputs.checkout != ''
-        run: git checkout ${{ inputs.checkout }}
-      - run: git log -1
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.11.8
-      - run: make install
-      - run: pip list
-      - name: Show TileDB/SOMA/OS versions
+          path: tiledbsoma
+      - name: Checkout ${{ inputs.checkout }}
+        if: inputs.checkout != ''
+        working-directory: tiledbsoma
         run: |
-          python -c 'import tiledbsoma; tiledbsoma.show_package_versions()'
+          git checkout ${{ inputs.checkout }}
+          git log -1
+      - name: Install TileDB-SOMA
+        run: pip install -e tiledbsoma/apis/python pytest
+      - name: Show package versions
+        run: |
           uname -a
+          pip list
+          python -c 'import tiledbsoma; tiledbsoma.show_package_versions()'
+          python tiledbsoma/scripts/show-versions.py
+      - name: Run census test
+        working-directory: census/tools/cellxgene_census_builder
+        run: pytest tests/test_builder.py
