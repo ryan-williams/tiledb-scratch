@@ -18,7 +18,7 @@ on:
         description: 'Checkout TileDB-SOMA at this commit or ref'
 jobs:
   build:
-    name: repro (${{ inputs.runs-on || 'ubuntu-latest' }})
+    name: Test ${{ inputs.checkout || inputs.ref || 'main' }}
     runs-on: ${{ inputs.runs-on || 'ubuntu-latest' }}
     steps:
       - name: 'Debug: `github` context'
