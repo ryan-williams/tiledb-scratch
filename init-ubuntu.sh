@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Initialize an Ubuntu (ami-0b33ebbed151cf740) instance (m6a.4xlarge), repro https://github.com/single-cell-data/TileDB-SOMA/issues/2920:
 # ```bash
-# . <(curl https://raw.githubusercontent.com/ryan-williams/tiledb-scratch/census-test/init-ubuntu.sh)
+# bash -i <(curl https://raw.githubusercontent.com/ryan-williams/tiledb-scratch/census-test/init-ubuntu.sh) [commits to test...; current `main`, by default]
 # ```
 
 set -ex
@@ -40,7 +40,9 @@ pip install -e cellxgene-census/tools/cellxgene_census_builder
 
 test() {
     pushd ~/TileDB-SOMA
+    echo "Testing $1"
     git checkout "$1"
+    git --no-pager log -1
     make clean
     pip install -e apis/python
     cd ~/cellxgene-census/tools/cellxgene_census_builder
@@ -50,5 +52,12 @@ test() {
     return $rv
 }
 
-test 7241fef7   # ❌ fails
-test 7241fef7^  # ✅ would pass, but won't run here, due to `set -e` and the failure above
+# test 7241fef7   # ❌ fails
+# test 7241fef7^  # ✅ passes
+
+if [ $# -eq 0 ]; then
+    set -- main
+fi
+for arg in "$@"; do
+    test "$arg" && echo "✅ $arg succeeded" || echo "❌ $arg failed"
+done
