@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -i
 # Initialize an Ubuntu (ami-0b33ebbed151cf740) instance (m6a.4xlarge), repro https://github.com/single-cell-data/TileDB-SOMA/issues/2920:
 # ```bash
-# bash -i <(curl https://raw.githubusercontent.com/ryan-williams/tiledb-scratch/census-test/init-ubuntu.sh) [commits to test...; current `main`, by default]
+# bash <(curl https://raw.githubusercontent.com/ryan-williams/tiledb-scratch/census-test/init-ubuntu.sh) [commits to test...; current `main`, by default]
 # ```
 
 set -ex
