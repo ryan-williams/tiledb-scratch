@@ -7,13 +7,44 @@ on:
       runs-on:
         description: Host
         type: choice
+        default: macos-latest
         options:
           - ubuntu-latest
           - macos-latest
           - macos-latest-xlarge
           - windows-latest
+      ref:
+        description: TileDB-SOMA branch or tag to clone
+        default: main
+      python-version:
+        description: Python version to use
+        default: 3.9.13
+      build-debug:
+        type: boolean
+        default: False
+        description: 'Build libtiledbsoma with `build=Debug`'
+      tests:
+        description: Tests to run (under apis/python/)
+        default: tests
 jobs:
   job:
+    name: TileDB-SOMA tests (py${{ inputs.python-version }})
     runs-on: ${{ inputs.runs-on }}
     steps:
-      - run: echo "Hello, World!"
+      - name: Checkout TileDB-SOMA@${{ inputs.ref }}
+        uses: actions/checkout@v4
+        with:
+          repository: single-cell-data/TileDB-SOMA
+          ref: ${{ inputs.ref }}
+      - name: Set up Python ${{ inputs.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+      - name: Build + Install
+        run: |
+          make install ${{ inputs.build-debug && 'build=Debug' || '' }}
+          pip install -r apis/python/requirements_dev.txt
+          make data
+      - name: Run tests
+        run: pytest ${{ inputs.tests }}
+        working-directory: apis/python
