@@ -32,7 +32,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11.8
-      - run: |
+      - name: Install TileDB-Py, TileDB-SOMA
+        run: |
           if [ -d tiledbsoma ]; then
             echo "Installing TileDB-SOMA from source"
             echo "1.15.0rc0" > tiledbsoma/apis/python/RELEASE-VERSION
