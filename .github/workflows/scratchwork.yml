@@ -4,12 +4,13 @@ on:
     inputs:
       runs-on:
         description: 'Select a runner ("macos-latest" = Intel, "macos-latest-xlarge" = M1)'
-        default: 'macos-latest-xlarge'
+        default: 'macos-14'
         type: choice
         options:
-          - macos-latest
-          - macos-latest-xlarge
-          - ubuntu-latest
+          - macos-13
+          - macos-14
+          - ubuntu-20
+          - ubuntu-22
           # - windows-latest
       ref:
         description: 'Branch or tag clone/install/test (leave blank to install latest version from PyPI)'
@@ -50,6 +51,8 @@ jobs:
       - name: 'Run with `import tiledb` before `import tiledbsoma` (sometimes segfaults)'
         env:
           IMPORT_TILEDB: 1
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           ./segfault-repro.py
           rv=$?
