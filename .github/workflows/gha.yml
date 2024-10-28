@@ -43,9 +43,6 @@ jobs:
           repository: ${{ inputs.soma-org }}/SOMA
           ref: ${{ inputs.soma-ref }}
           path: soma
-          # Required for version computation
-          fetch-depth: 0
-          fetch-tags: true
       - name: Checkout TileDB-SOMA@${{ inputs.tdbs-ref }}
         uses: actions/checkout@v4
         with:
@@ -57,7 +54,9 @@ jobs:
         with:
           python-version: ${{ inputs.python-version }}
       - name: Install SOMA, TileDB-SOMA
+        env:
+          SETUPTOOLS_SCM_PRETEND_VERSION_FOR_SOMACORE: 1.0.21
         run: pip install -e tdbs/apis/python[dev] -e soma
       - name: Run tests
         run: pytest ${{ inputs.tests }}
-        working-directory: apis/python
+        working-directory: tdbs/apis/python
