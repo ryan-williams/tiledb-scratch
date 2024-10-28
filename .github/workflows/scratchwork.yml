@@ -36,10 +36,10 @@ jobs:
           if [ -d tiledbsoma ]; then
             echo "Installing TileDB-SOMA from source"
             echo "1.15.0rc0" > tiledbsoma/apis/python/RELEASE-VERSION
-            pip install -r requirements-local.txt
+            pip install -e tiledbsoma/apis/python tiledb
           else
             echo "Installing TileDB-SOMA from PyPI"
-            pip install -r requirements-pypi.txt
+            pip install tiledbsoma tiledb
           fi
       - run: pip list
       - name: Show TileDB/SOMA/OS versions
