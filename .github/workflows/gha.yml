@@ -24,6 +24,9 @@ on:
       python-versions:
         description: Python versions to test
         default: '"3.9.19"'
+      typeguard-versions:
+        description: Typeguard versions to test
+        default: '"4.2.1", "4.3.0", "4.4.0"'
       tests:
         description: Tests to run (under apis/python/)
         default: tests
@@ -31,10 +34,11 @@ jobs:
   job:
     strategy:
       matrix:
+        typeguard-version: ${{ fromJSON(format('[{0}]', inputs.typeguard-versions)) }}
         soma-ref: ${{ fromJSON(format('[{0}]', inputs.soma-refs)) }}
         python-version: ${{ fromJSON(format('[{0}]', inputs.python-versions)) }}
       fail-fast: false
-    name: ${{ matrix.python-version }} soma@${{ matrix.soma-ref }}
+    name: '${{ matrix.python-version }}, soma ${{ matrix.soma-ref }}, typeguard ${{ matrix.typeguard-version }}'
     runs-on: ${{ inputs.runs-on }}
     steps:
       - name: Checkout ${{ inputs.soma-org }}/SOMA@${{ matrix.soma-ref }}
@@ -56,7 +60,9 @@ jobs:
       - name: Install SOMA, TileDB-SOMA
         env:
           SETUPTOOLS_SCM_PRETEND_VERSION_FOR_SOMACORE: ${{ inputs.soma-pretend-version }}
-        run: pip install -e tdbs/apis/python[dev] -e soma
+        run: |
+          pip install -e tdbs/apis/python[dev] -e soma
+          pip install typeguard==${{ matrix.typeguard-version }}  # Install separately, to avoid tdbs pin
       - run: make data
         working-directory: tdbs
       - name: Run tests
