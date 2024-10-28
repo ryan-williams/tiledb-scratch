@@ -11,13 +11,13 @@ on:
       soma-org:
         description: Org to clone single-cell-data/SOMA from
         type: choice
-        default: ryan-williams
+        default: single-cell-data
         options:
           - single-cell-data
           - ryan-williams
       soma-refs:
-        description: single-cell-data/SOMA branch or tag to clone
-        default: '"main", "slc"'
+        description: SOMA branch or tag to clone
+        default: '"main", "rw/slc"'
       soma-pretend-version:
         description: "Set the SOMA version, to satisfy TileDB-SOMA's pin (despite a shallow SOMA clone that's unable to compute a sensible version for itself)"
         default: '1.0.21'
