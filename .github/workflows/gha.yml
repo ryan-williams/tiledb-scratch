@@ -23,13 +23,13 @@ on:
         default: '1.0.21'
       python-versions:
         description: Python versions to test
-        default: '"3.9.19"'
+        default: '"3.9.10", "3.9.19", "3.12.7"'
       typeguard-versions:
         description: Typeguard versions to test
         default: '"4.2.1", "4.3.0", "4.4.0"'
       tests:
         description: Tests to run (under apis/python/)
-        default: tests
+        default: 'tests/test_dataframe_index_columns.py::test_types_no_errors[soma_joinid-py-slice-index_column_names4-domain4-coords4-expecteds4]'
 jobs:
   job:
     strategy:
@@ -38,7 +38,7 @@ jobs:
         soma-ref: ${{ fromJSON(format('[{0}]', inputs.soma-refs)) }}
         python-version: ${{ fromJSON(format('[{0}]', inputs.python-versions)) }}
       fail-fast: false
-    name: '${{ matrix.python-version }}, soma ${{ matrix.soma-ref }}, typeguard ${{ matrix.typeguard-version }}'
+    name: '${{ matrix.python-version }} ${{ matrix.soma-ref }} ${{ matrix.typeguard-version }}'
     runs-on: ${{ inputs.runs-on }}
     steps:
       - name: Checkout ${{ inputs.soma-org }}/SOMA@${{ matrix.soma-ref }}
