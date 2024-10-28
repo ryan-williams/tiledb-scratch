@@ -23,7 +23,7 @@ on:
         default: '1.0.21'
       python-versions:
         description: Python versions to test
-        default: '"3.9.4", "3.9.7", "3.9.10", "3.9.13", "3.9.19"'
+        default: '"3.9.19"'
       tests:
         description: Tests to run (under apis/python/)
         default: tests
