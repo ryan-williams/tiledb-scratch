@@ -17,15 +17,15 @@ on:
         options:
           - single-cell-data
           - ryan-williams
-      soma-ref:
+      soma-refs:
         description: single-cell-data/SOMA branch or tag to clone
-        default: slc
+        default: '"main", "slc"'
       soma-pretend-version:
         description: "Set the SOMA version, to satisfy TileDB-SOMA's pin (despite a shallow SOMA clone that's unable to compute a sensible version for itself)"
         default: '1.0.21'
       python-versions:
         description: Python versions to test
-        default: '"3.9.10", "3.9.13"'
+        default: '"3.9.13", "3.9.19"'
       tests:
         description: Tests to run (under apis/python/)
         default: 'tests/test_dataframe_index_columns.py::test_types_no_errors[soma_joinid-py-slice-index_column_names4-domain4-coords4-expecteds4]'
@@ -33,16 +33,17 @@ jobs:
   job:
     strategy:
       matrix:
+        soma-ref: ${{ fromJSON(format('[{0}]', inputs.soma-refs)) }}
         python-version: ${{ fromJSON(format('[{0}]', inputs.python-versions)) }}
       fail-fast: false
-    name: ${{ matrix.python-version }} soma@${{ inputs.soma-ref }}
+    name: ${{ matrix.python-version }} soma@${{ matrix.soma-ref }}
     runs-on: ${{ inputs.runs-on }}
     steps:
-      - name: Checkout ${{ inputs.soma-org }}/SOMA@${{ inputs.soma-ref }}
+      - name: Checkout ${{ inputs.soma-org }}/SOMA@${{ matrix.soma-ref }}
         uses: actions/checkout@v4
         with:
           repository: ${{ inputs.soma-org }}/SOMA
-          ref: ${{ inputs.soma-ref }}
+          ref: ${{ matrix.soma-ref }}
           path: soma
       - name: Checkout TileDB-SOMA@${{ inputs.tdbs-ref }}
         uses: actions/checkout@v4
