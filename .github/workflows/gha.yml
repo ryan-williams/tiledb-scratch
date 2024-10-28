@@ -1,50 +1,63 @@
 # Placeholder Action on `main` branch, to be implemented/customized on
 # individual branches, to repro specific issues.
-name: gha.yml
+name: 'Test removing `Slice.__subclasscheck__` from SOMA'
 on:
   workflow_dispatch:
     inputs:
       runs-on:
         description: Host
         type: choice
-        default: macos-latest
+        default: ubuntu-latest
         options:
           - ubuntu-latest
           - macos-latest
           - macos-latest-xlarge
           - windows-latest
-      ref:
+      tdbs-ref:
         description: TileDB-SOMA branch or tag to clone
-        default: main
+        default: rw/tg
+      soma-org:
+        description: Org to clone single-cell-data/SOMA from
+        type: choice
+        default: ryan-williams
+        options:
+          - single-cell-data
+          - ryan-williams
+      soma-ref:
+        description: single-cell-data/SOMA branch or tag to clone
+        default: slc
       python-version:
         description: Python version to use
         default: 3.9.13
-      build-debug:
-        type: boolean
-        default: False
-        description: 'Build libtiledbsoma with `build=Debug`'
       tests:
         description: Tests to run (under apis/python/)
-        default: tests
+        default: 'tests/test_dataframe_index_columns.py::test_types_no_errors[soma_joinid-py-slice-index_column_names4-domain4-coords4-expecteds4]'
 jobs:
   job:
     name: TileDB-SOMA tests (py${{ inputs.python-version }})
     runs-on: ${{ inputs.runs-on }}
     steps:
-      - name: Checkout TileDB-SOMA@${{ inputs.ref }}
+      - name: Checkout ${{ inputs.soma-org }}/SOMA@${{ inputs.soma-ref }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.soma-org }}/SOMA
+          ref: ${{ inputs.soma-ref }}
+          path: soma
+          # Required for version computation
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Checkout TileDB-SOMA@${{ inputs.tdbs-ref }}
         uses: actions/checkout@v4
         with:
           repository: single-cell-data/TileDB-SOMA
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.tdbs-ref }}
+          path: tdbs
       - name: Set up Python ${{ inputs.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
-      - name: Build + Install
-        run: |
-          make install ${{ inputs.build-debug && 'build=Debug' || '' }}
-          pip install -r apis/python/requirements_dev.txt
-          make data
+      - name: Install SOMA, TileDB-SOMA
+        run: pip install -e tdbs/apis/python[dev] -e soma
       - name: Run tests
         run: pytest ${{ inputs.tests }}
         working-directory: apis/python
