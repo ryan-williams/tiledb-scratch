@@ -6,13 +6,7 @@ on:
     inputs:
       runs-on:
         description: Host
-        type: choice
-        default: ubuntu-latest
-        options:
-          - ubuntu-latest
-          - macos-latest
-          - macos-latest-xlarge
-          - windows-latest
+        default: ubuntu-20.04
       tdbs-ref:
         description: TileDB-SOMA branch or tag to clone
         default: rw/tg
@@ -29,15 +23,19 @@ on:
       soma-pretend-version:
         description: "Set the SOMA version, to satisfy TileDB-SOMA's pin (despite a shallow SOMA clone that's unable to compute a sensible version for itself)"
         default: '1.0.21'
-      python-version:
-        description: Python version to use
-        default: 3.9.13
+      python-versions:
+        description: Python versions to test
+        default: '"3.9.10", "3.9.13"'
       tests:
         description: Tests to run (under apis/python/)
         default: 'tests/test_dataframe_index_columns.py::test_types_no_errors[soma_joinid-py-slice-index_column_names4-domain4-coords4-expecteds4]'
 jobs:
   job:
-    name: ${{ inputs.python-version }} soma@${{ inputs.tdbs-ref }}
+    strategy:
+      matrix:
+        python-version: ${{ fromJSON(format('[{0}]', inputs.python-versions)) }}
+      fail-fast: false
+    name: ${{ matrix.python-version }} soma@${{ inputs.soma-ref }}
     runs-on: ${{ inputs.runs-on }}
     steps:
       - name: Checkout ${{ inputs.soma-org }}/SOMA@${{ inputs.soma-ref }}
@@ -52,10 +50,10 @@ jobs:
           repository: single-cell-data/TileDB-SOMA
           ref: ${{ inputs.tdbs-ref }}
           path: tdbs
-      - name: Set up Python ${{ inputs.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ inputs.python-version }}
+          python-version: ${{ matrix.python-version }}
       - name: Install SOMA, TileDB-SOMA
         env:
           SETUPTOOLS_SCM_PRETEND_VERSION_FOR_SOMACORE: ${{ inputs.soma-pretend-version }}
