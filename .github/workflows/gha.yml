@@ -1,6 +1,4 @@
-# Placeholder Action on `main` branch, to be implemented/customized on
-# individual branches, to repro specific issues.
-name: 'Test removing `Slice.__subclasscheck__` from SOMA'
+name: 'rm SOMA `Slice.__subclasscheck__`'
 on:
   workflow_dispatch:
     inputs:
@@ -25,10 +23,10 @@ on:
         default: '1.0.21'
       python-versions:
         description: Python versions to test
-        default: '"3.9.13", "3.9.19"'
+        default: '"3.9.4", "3.9.7", "3.9.10", "3.9.13", "3.9.19"'
       tests:
         description: Tests to run (under apis/python/)
-        default: 'tests/test_dataframe_index_columns.py::test_types_no_errors[soma_joinid-py-slice-index_column_names4-domain4-coords4-expecteds4]'
+        default: tests
 jobs:
   job:
     strategy:
@@ -59,6 +57,8 @@ jobs:
         env:
           SETUPTOOLS_SCM_PRETEND_VERSION_FOR_SOMACORE: ${{ inputs.soma-pretend-version }}
         run: pip install -e tdbs/apis/python[dev] -e soma
+      - run: make data
+        working-directory: tdbs
       - name: Run tests
-        run: pytest ${{ inputs.tests }}
+        run: pytest --maxfail=10 ${{ inputs.tests }}
         working-directory: tdbs/apis/python
