@@ -1,4 +1,4 @@
-name: S3 Census issue
+name: Repro spurious DoesNotExistError
 on:
   workflow_dispatch:
     inputs:
@@ -23,7 +23,7 @@ env:
   AWS_REGION: us-west-2
 jobs:
   job:
-    name: S3 Census issue
+    name: Repro spurious DoesNotExistError
     runs-on: ${{ inputs.runs-on }}
     steps:
       - uses: actions/checkout@v4
@@ -31,5 +31,8 @@ jobs:
         with:
           python-version: ${{ inputs.python-version }}
       - run: pip install tiledbsoma
+      # ✅ The URI exists on S3
       - run: aws s3 ls ${{ inputs.uri }}
-      - run: python test.py ${{ inputs.uri }}
+      # ❌ tiledbsoma.open raises DoesNotExistError for some reason
+      - run: python open.py ${{ inputs.uri }}
+      - run: python exp-open.py ${{ inputs.uri }}
