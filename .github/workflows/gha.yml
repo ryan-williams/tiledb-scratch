@@ -37,6 +37,10 @@ jobs:
       - name: Test "aws s3 ls"
         run: aws s3 ls ${{ inputs.uri }}
       - name: Test tiledbsoma.open
-        run: python open.py ${{ inputs.uri }}
+        run: |
+          cat open.py
+          python open.py ${{ inputs.uri }}
       - name: Test Experiment.open
-        run: python exp-open.py ${{ inputs.uri }}
+        run: |
+          cat exp-open.py
+          python exp-open.py ${{ inputs.uri }}
