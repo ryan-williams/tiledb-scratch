@@ -2,21 +2,6 @@ name: Repro spurious DoesNotExistError
 on:
   workflow_dispatch:
     inputs:
-      runs-on:
-        description: Host
-        type: choice
-        default: ubuntu-latest
-        options:
-          - ubuntu-latest
-          - macos-latest
-          - macos-latest-xlarge
-          - windows-latest
-      python-version:
-        description: Python version to use
-        default: 3.11.8
-      tdbs-version:
-        description: TileDB-SOMA version to test
-        default: 1.14.5
       uri:
         description: S3 URI to check
         default: s3://cellxgene-census-public-us-west-2/cell-census/2024-07-01/soma/census_data/homo_sapiens/ms/RNA/X/raw
@@ -26,14 +11,21 @@ env:
   AWS_REGION: us-west-2
 jobs:
   job:
-    name: Repro spurious DoesNotExistError
-    runs-on: ${{ inputs.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        tdbs-version: [ "1.14.5", "1.15.0rc4" ]
+        runs-on: [ "ubuntu-latest" ]
+        python-version: [ "3.9.19", "3.11.8" ]
+    name: ${{ matrix.tdbs-version }} ${{ matrix.python-version }} ${{ matrix.runs-on }}
+    runs-on: ${{ matrix.runs-on }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ inputs.python-version }}
-      - run: pip install tiledbsoma==${{ inputs.tdbs-version }}
+          python-version: ${{ matrix.python-version }}
+      - run: pip install tiledbsoma==${{ matrix.tdbs-version }}
+      - run: python -c 'import tiledbsoma; tiledbsoma.show_package_versions()'
       - name: Test "aws s3 ls"
         run: aws s3 ls ${{ inputs.uri }}
       - name: Test tiledbsoma.open
