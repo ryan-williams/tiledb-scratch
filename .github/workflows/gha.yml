@@ -1,50 +1,35 @@
-# Placeholder Action on `main` branch, to be implemented/customized on
-# individual branches, to repro specific issues.
-name: gha.yml
+name: S3 Census issue
 on:
   workflow_dispatch:
     inputs:
       runs-on:
         description: Host
         type: choice
-        default: macos-latest
+        default: ubuntu-latest
         options:
           - ubuntu-latest
           - macos-latest
           - macos-latest-xlarge
           - windows-latest
-      ref:
-        description: TileDB-SOMA branch or tag to clone
-        default: main
       python-version:
         description: Python version to use
-        default: 3.9.13
-      build-debug:
-        type: boolean
-        default: False
-        description: 'Build libtiledbsoma with `build=Debug`'
-      tests:
-        description: Tests to run (under apis/python/)
-        default: tests
+        default: 3.11.8
+      uri:
+        description: S3 URI to check
+        default: s3://cellxgene-census-public-us-west-2/cell-census/2024-07-01/soma/census_data/homo_sapiens/ms/RNA/X/raw
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: us-west-2
 jobs:
   job:
-    name: TileDB-SOMA tests (py${{ inputs.python-version }})
+    name: S3 Census issue
     runs-on: ${{ inputs.runs-on }}
     steps:
-      - name: Checkout TileDB-SOMA@${{ inputs.ref }}
-        uses: actions/checkout@v4
-        with:
-          repository: single-cell-data/TileDB-SOMA
-          ref: ${{ inputs.ref }}
-      - name: Set up Python ${{ inputs.python-version }}
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
-      - name: Build + Install
-        run: |
-          make install ${{ inputs.build-debug && 'build=Debug' || '' }}
-          pip install -r apis/python/requirements_dev.txt
-          make data
-      - name: Run tests
-        run: pytest ${{ inputs.tests }}
-        working-directory: apis/python
+      - run: pip install tiledbsoma
+      - run: aws s3 ls ${{ inputs.uri }}
+      - run: python test.py ${{ inputs.uri }}
